@@ -3,6 +3,7 @@ from enum import Enum
 import torch
 import joblib
 import tensorflow as tf
+import shutil
 
 class ModelType(Enum):
     PYTORCH = "pytorch"
@@ -79,3 +80,33 @@ def save_model(model, params, path):
         joblib.dump(model, path)
     else:
         raise ValueError(f"不支持的模型类型: {model_type}")
+    
+def clear_model(path):
+    if os.path.exists(path):
+        for filename in os.listdir(path):
+            file_path = os.path.join(path, filename)
+            os.unlink(file_path)
+
+def copy_model(from_path, to_path):
+    for filename in os.listdir(from_path):
+        src_file = os.path.join(from_path, filename)
+        dest_file = os.path.join(to_path, filename)
+        shutil.copy2(src_file, dest_file)
+
+def get_model_parameters(model):
+    """
+    输入一个模型，输出其参数字典。
+    支持 PyTorch、TensorFlow/Keras、Scikit-learn。
+    """
+    # PyTorch
+    if hasattr(model, 'named_parameters'):
+        return {name: param.clone() for name, param in model.named_parameters()}
+    # TensorFlow/Keras
+    elif hasattr(model, 'get_weights') and hasattr(model, 'weights'):
+        return {w.name: w.numpy().copy() for w in model.weights}
+    # Scikit-learn
+    elif hasattr(model, 'get_params'):
+        return model.get_params(deep=True)
+    else:
+        raise ValueError("不支持的模型类型或无法提取参数")
+

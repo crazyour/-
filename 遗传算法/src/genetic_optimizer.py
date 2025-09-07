@@ -1,15 +1,14 @@
-from model_manager import load_model, get_model_parameters,save_model
-import os
-import shutil
+from src.model_manager import load_model,save_model,get_model_parameters,clear_model,copy_model
 import random
 import torch
 import numpy as np
-from evaluate import evaluate
+import os
+#from evaluate import evaluate
 
-def run_genetic_algorithm(generations, parent_population_size, children_population_size, evaluate):
+def run_genetic_algorithm(generations, parent_population_size, children_population_size, evaluate, extension):
     """运行遗传算法的主流程"""
-    if not callable(evaluate):
-        raise ValueError("必须提供 evaluate 函数，用于计算模型的适应值")
+    # if not callable(evaluate):
+    #     raise ValueError("必须提供 evaluate 函数，用于计算模型的适应值")
 
     # 初始化种群和适应度列表
     population_pool = {
@@ -22,9 +21,13 @@ def run_genetic_algorithm(generations, parent_population_size, children_populati
     }
 
     # 初始化种群
-    population_pool, fitness_list = initialize_population(parent_population_size, population_pool, fitness_list)
-    print("初始精英:", fitness_list['parents'], flush=True)
+    for index in range(parent_population_size):
+        population_pool['parents'][index] = f"models/parents/{index}{extension}"
+    print("初始适应值:", fitness_list['parents'], flush=True)
     print(population_pool)
+    exit()  # 结束进程
+
+    
 
     # 遗传算法迭代
     for generation in range(generations):
@@ -51,6 +54,8 @@ def crossover(children_population_size, parent_population_size, population_pool)
         params_0 = get_model_parameters(model_0)
         params_1 = get_model_parameters(model_1)
 
+        print(params_0)
+        exit()
         # 交叉操作
         model_2_params = {}
         for name in params_0.keys():
@@ -79,26 +84,9 @@ def crossover(children_population_size, parent_population_size, population_pool)
         
     return population_pool
 
-# 初始化种群
-def initialize_population(parent_population_size, population_pool, fitness_list):
-    for i in range(parent_population_size):
-        population_pool['parents'][i] = f"/home/luanma12/recognition_10/evolutionary/model/parent_population_elite/model_{i}.pth"
-        population_pool['parents_diverse'][i] = f"/home/luanma12/recognition_10/evolutionary/model/parent_population_diverse/model_{i}.pth"
-    clear_model('models/children')
-    clear_model('models/parents')
 
 
-def clear_model(path):
-    if os.path.exists(path):
-        for filename in os.listdir(path):
-            file_path = os.path.join(path, filename)
-            os.unlink(file_path)
 
-def copy_model(from_path, to_path):
-    for filename in os.listdir(from_path):
-        src_file = os.path.join(from_path, filename)
-        dest_file = os.path.join(to_path, filename)
-        shutil.copy2(src_file, dest_file)
 
 # 适应值计算
 def fitness(population_pool, fitness_list, population_type, evaluate):
