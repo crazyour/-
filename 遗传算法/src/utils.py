@@ -7,12 +7,15 @@ def rename_models():
     directory = "models/parents"  # 模型文件所在的固定目录
     count = 0
     extension = None
-    for idx, filename in enumerate(os.listdir(directory)):
+    for filename in enumerate(os.listdir(directory)):
         old_path = os.path.join(directory, filename)
         ext = os.path.splitext(filename)[1]
+        if not ext:  # 如果文件没有后缀，跳过处理
+            print(f"跳过: {old_path}（没有后缀）")
+            continue
         if extension is None:
             extension = ext  # 记录第一个文件的后缀
-        new_path = os.path.join(directory, f"{idx}{ext}")
+        new_path = os.path.join(directory, f"{count}{ext}")  # 使用 count 而不是 idx 作为索引
         os.rename(old_path, new_path)
         print(f"重命名: {old_path} -> {new_path}")
         count += 1
