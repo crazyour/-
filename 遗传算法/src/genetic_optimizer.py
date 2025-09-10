@@ -25,6 +25,7 @@ def run_genetic_algorithm(generations, parent_population_size, children_populati
     # 初始化种群
     for index in range(parent_population_size):
         population_pool['parents'][index] = f"models/parents/{index}{extension}"
+        fitness_list = fitness(population_pool, fitness_list, 'parents')
     print("初始适应值:", fitness_list['parents'], flush=True)
     print(population_pool)
 
@@ -48,19 +49,14 @@ def crossover(children_population_size, parent_population_size, population_pool)
         selected_combinations = random.sample(all_combinations, children_population_size)
 
     for index, (model0_idx, model1_idx) in enumerate(selected_combinations): 
-        model0_path = population_pool['parents'][model0_idx]
-        model1_path = population_pool['parents'][model1_idx]
-    
-        # 使用 model_loader 加载模型
-        model_0 = load_model(model0_path)
-        model_1 = load_model(model1_path)
+        model0_params_path = population_pool['parents'][model0_idx]
+        model1_params_path = population_pool['parents'][model1_idx]
+
 
         # 提取参数
-        params_0 = get_model_parameters(model_0)
-        params_1 = get_model_parameters(model_1)
+        params_0 = get_model_parameters(model0_params_path)
+        params_1 = get_model_parameters(model1_params_path)
 
-        print(params_0)
-        exit()
         # 交叉操作
         model_2_params = {}
         for name in params_0.keys():

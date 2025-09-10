@@ -1,7 +1,7 @@
 import argparse
 from src.genetic_optimizer import run_genetic_algorithm
 from src.utils import rename_models
-from src.train import train
+from src.DQN import train
 if __name__ == "__main__":
     # 定义命令行参数
     parser = argparse.ArgumentParser(description="运行遗传算法")

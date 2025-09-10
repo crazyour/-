@@ -21,12 +21,7 @@ def copy_model(from_path, to_path):
         shutil.copy2(src_file, dest_file)
 
 def load_model(model_params_path, env=None):
-    # 加载仅参数的模型  
-    model = create_model()
-    model.policy.load_state_dict(torch.load(model_params_path))
-    model.set_device("cuda")
-    print("模型参数已加载并移动到 GPU")
-    return model
+    pass
 
 def get_model_parameters(model_params_path):
    # 获取模型的参数
